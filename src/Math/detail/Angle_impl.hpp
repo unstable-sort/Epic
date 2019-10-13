@@ -99,19 +99,23 @@ public:
 	auto SinCos() const noexcept { return std::make_pair(Sin(), Cos()); }
 
 public:
-	Radian<T>& Normalize(T min = T(0)) noexcept;
-
-	static Radian<T> NormalOf(Radian<T> value, T min = T(0)) noexcept
+	Radian<T>& Normalize() noexcept
 	{
-		return value.Normalize(min);
+		m_Value = std::remainder(m_Value, Epic::TwoPi<T>);
+		m_Value += (m_Value < T(0)) ? Epic::TwoPi<T> : T(0);
+
+		return *this;
+	}
+
+	static Radian<T> NormalOf(Radian<T> value) noexcept
+	{
+		return value.Normalize();
 	}
 
 public:
 	Radian<T>& operator = (Radian<T>&& value) = default;
 
 	constexpr Radian<T> operator - () const { return { -m_Value }; }
-
-	constexpr explicit operator Degree<T>() const { return Degree<T>(RadiansToDegrees(m_Value)); }
 
 	constexpr Radian<T>& operator = (Radian<T> value) noexcept { m_Value = value.Value(); return *this; }
 	constexpr Radian<T>& operator += (Radian<T> value) noexcept { m_Value += value.Value(); return *this; }
@@ -224,18 +228,6 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////
 
-// Radian Implementation
-template<class T>
-Epic::Radian<T>& Epic::Radian<T>::Normalize(T min) noexcept
-{
-	m_Value = std::remainder(m_Value + min, Epic::TwoPi<T>);
-	m_Value -= (m_Value < T(0)) ? min - Epic::TwoPi<T> : min;
-
-	return *this;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
 // Degree
 template<class T>
 class Epic::Degree
@@ -280,30 +272,34 @@ public:
 
 	template<class U, typename = std::enable_if_t<!std::is_same_v<U, T> && std::is_convertible_v<U, T>>>
 	constexpr explicit Degree(Radian<U> value) noexcept
-		: m_Value{ Epic::RadiansToDegrees(static_cast<T>(value.Value())) }
+		: m_Value{ static_cast<T>(Epic::RadiansToDegrees(value.Value())) }
 	{ }
 
 public:
 	constexpr T Value() const noexcept { return m_Value; }
-	T Sin() const noexcept { return static_cast<value_type>(std::sin(m_Value)); }
-	T Cos() const noexcept { return static_cast<value_type>(std::cos(m_Value)); }
-	T Tan() const noexcept { return static_cast<value_type>(std::tan(m_Value)); }
+	T Sin() const noexcept { return static_cast<value_type>(std::sin(Epic::DegreesToRadians(m_Value))); }
+	T Cos() const noexcept { return static_cast<value_type>(std::cos(Epic::DegreesToRadians(m_Value))); }
+	T Tan() const noexcept { return static_cast<value_type>(std::tan(Epic::DegreesToRadians(m_Value))); }
 	auto SinCos() const noexcept { return std::make_pair(Sin(), Cos()); }
 
 public:
-	Degree<T>& Normalize(T min = T(0)) noexcept;
-
-	static Degree<T> NormalOf(Degree<T> value, T min = T(0)) noexcept
+	Degree<T>& Normalize() noexcept
 	{
-		return value.Normalize(min);
+		m_Value = std::remainder(m_Value, T(360));
+		m_Value += (m_Value < T(0)) ? T(360) : T(0);
+
+		return *this;
+	}
+
+	static Degree<T> NormalOf(Degree<T> value) noexcept
+	{
+		return value.Normalize();
 	}
 
 public:
 	Degree<T>& operator = (Degree<T>&& value) = default;
 
 	constexpr Degree<T> operator - () const { return { -m_Value }; }
-
-	constexpr explicit operator Radian<T>() const { return Radian<T>(Epic::DegreesToRadians(m_Value)); }
 
 	constexpr Degree<T>& operator = (Degree<T> value) noexcept { m_Value = value.Value(); return *this; }
 	constexpr Degree<T>& operator += (Degree<T> value) noexcept { m_Value += value.Value(); return *this; }
@@ -413,18 +409,6 @@ public:
 	constexpr bool operator == (Degree<T> value) const noexcept { return m_Value == value.Value(); }
 	constexpr bool operator != (Degree<T> value) const noexcept { return m_Value != value.Value(); }
 };
-
-//////////////////////////////////////////////////////////////////////////////
-
-// Degree Implementation
-template<class T>
-Epic::Degree<T>& Epic::Degree<T>::Normalize(T min) noexcept
-{
-	m_Value = std::remainder(m_Value + min, Epic::TwoPi<T>);
-	m_Value -= (m_Value < T(0)) ? min - Epic::TwoPi<T> : min;
-
-	return *this;
-}
 
 //////////////////////////////////////////////////////////////////////////////
 
