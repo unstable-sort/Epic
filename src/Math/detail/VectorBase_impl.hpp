@@ -63,10 +63,7 @@ public:
 		container_type Values;
 
 		// 1-Component VectorSwizzlers
-		struct
-		{
-			SWIZZLE_1(0, x);
-		};
+		SWIZZLE_1(0, x);
 
 		#if defined(EPIC_SWIZZLE) || defined(EPIC_SWIZZLE_XYZW)
 
@@ -122,11 +119,8 @@ public:
 		container_type Values;
 
 		// 1-Component VectorSwizzlers
-		struct
-		{
-			SWIZZLE_1(0, x);
-			SWIZZLE_1(1, y);
-		};
+		SWIZZLE_1(0, x);
+		SWIZZLE_1(1, y);
 
 		#if defined(EPIC_SWIZZLE) || defined(EPIC_SWIZZLE_XYZW)
 
@@ -233,12 +227,9 @@ public:
 		container_type Values;
 
 		// 1-Component VectorSwizzlers
-		struct
-		{
-			SWIZZLE_1(0, x);
-			SWIZZLE_1(1, y);
-			SWIZZLE_1(2, z);
-		};
+		SWIZZLE_1(0, x);
+		SWIZZLE_1(1, y);
+		SWIZZLE_1(2, z);
 
 		#if defined(EPIC_SWIZZLE) || defined(EPIC_SWIZZLE_XYZW)
 
@@ -524,13 +515,10 @@ public:
 		container_type Values;
 
 		// 1-Component VectorSwizzlers
-		struct
-		{
-			SWIZZLE_1(0, x);
-			SWIZZLE_1(1, y);
-			SWIZZLE_1(2, z);
-			SWIZZLE_1(3, w);
-		};
+		SWIZZLE_1(0, x);
+		SWIZZLE_1(1, y);
+		SWIZZLE_1(2, z);
+		SWIZZLE_1(3, w);
 
 		#if defined(EPIC_SWIZZLE) || defined(EPIC_SWIZZLE_XYZW)
 
