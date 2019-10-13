@@ -23,7 +23,7 @@
 
 #include "VectorBase.h"
 #include "Quaternion_decl.h"
-#include "Span.hpp"
+#include "MetaHelpers.hpp"
 #include "../Angle.h"
 #include "../Tags.h"
 #include "../../Meta/Utility.hpp"
@@ -1133,7 +1133,7 @@ namespace Epic
 namespace Epic
 {
 	template<class... Ts, typename = std::enable_if_t<!detail::HasTag_v<Ts...>>>
-	Vector(Ts&&... values)->Vector<Epic::detail::SpanElement_t<Ts...>, Epic::detail::Span_v<Ts...>>;
+	Vector(Ts&&... values) -> Vector<Epic::detail::SpanElement_t<Ts...>, Epic::detail::Span_v<Ts...>>;
 }
 
 //////////////////////////////////////////////////////////////////////////////

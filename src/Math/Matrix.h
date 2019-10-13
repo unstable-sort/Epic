@@ -35,7 +35,7 @@ namespace Epic
 	using Matrix2f = Matrix<float, 2>;
 	using Matrix3f = Matrix<float, 3>;
 	using Matrix4f = Matrix<float, 4>;
-		  
+
 	using Matrix2d = Matrix<double, 2>;
 	using Matrix3d = Matrix<double, 3>;
 	using Matrix4d = Matrix<double, 4>;

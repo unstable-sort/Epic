@@ -19,7 +19,7 @@
 
 #include "Quaternion_decl.h"
 #include "MatrixBase.hpp"
-#include "Span.hpp"
+#include "MetaHelpers.hpp"
 #include "../Angle.h"
 #include "../Tags.h"
 #include "../Vector.h"
@@ -161,6 +161,15 @@ public:
 	Matrix(const ScaleTag&, const Us&&... values) noexcept
 	{
 		MakeScale(std::forward<Us>(values)...);
+	}
+
+	template<class... Us, typename = std::enable_if_t<
+		!Meta::IsVariadicTypeOf<type, Us...> &&
+		!detail::HasTag_v<Us...> &&
+		detail::Span_v<Us...> == ElementCount>>
+	Matrix(Us&&... values) noexcept
+	{
+		detail::SpanConstructor<T>::Construct(std::begin(Values), std::forward<Us>(values)...);
 	}
 	
 public:
@@ -1361,6 +1370,17 @@ namespace Epic
 
 		return stream;
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+// Deduction Guides
+namespace Epic
+{
+	template<class... Ts, typename = std::enable_if_t<
+		!detail::HasTag_v<Ts...> &&
+		detail::IsMatrixSquare_v<detail::Span_v<Ts...>>>>
+	Matrix(Ts&&... values) -> Matrix<detail::SpanElement_t<Ts...>, (detail::CalculateMatrixSize(detail::Span_v<Ts...>))>;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -83,9 +83,6 @@
     <ClInclude Include="src\Math\Tags.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\detail\Span.hpp">
-      <Filter>Math\detail</Filter>
-    </ClInclude>
     <ClInclude Include="src\Meta\Utility.hpp">
       <Filter>Meta</Filter>
     </ClInclude>
@@ -115,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="src\Meta\TypeTraits.hpp">
       <Filter>Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Math\detail\MetaHelpers.hpp">
+      <Filter>Math\detail</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

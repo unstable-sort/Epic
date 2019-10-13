@@ -253,3 +253,28 @@ namespace Epic::detail
 	};
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+namespace Epic::detail
+{
+	constexpr size_t CalculateMatrixSize(size_t N, size_t estimate)
+	{
+		if (estimate * estimate == N)
+			return estimate;
+
+		return estimate * estimate > N
+			? 0
+			: CalculateMatrixSize(N, estimate + 1);
+	}
+
+	constexpr size_t CalculateMatrixSize(size_t N)
+	{
+		return CalculateMatrixSize(N, 0);
+	}
+
+	template<size_t N>
+	struct IsMatrixSquare : std::bool_constant<(CalculateMatrixSize(N) != 0)> { };
+
+	template<size_t N>
+	static constexpr bool IsMatrixSquare_v = IsMatrixSquare<N>::value;
+}
