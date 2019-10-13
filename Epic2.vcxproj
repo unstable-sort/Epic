@@ -145,7 +145,7 @@
     <ClInclude Include="src\Math\detail\Matrix_impl.hpp" />
     <ClInclude Include="src\Math\detail\Quaternion_decl.h" />
     <ClInclude Include="src\Math\detail\Quaternion_impl.hpp" />
-    <ClInclude Include="src\Math\detail\Span.hpp" />
+    <ClInclude Include="src\Math\detail\MetaHelpers.hpp" />
     <ClInclude Include="src\Math\detail\VectorBase.h" />
     <ClInclude Include="src\Math\detail\VectorBase_decl.h" />
     <ClInclude Include="src\Math\detail\VectorBase_impl.hpp" />
