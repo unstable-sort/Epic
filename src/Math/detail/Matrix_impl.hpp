@@ -1523,6 +1523,12 @@ namespace Epic
 		}
 
 		template<class T>
+		Matrix<T, 4> CreatePerspectiveMatrix(Degree<T> fovy, T aspectRatio, T znear, T zfar) noexcept
+		{
+			return CreatePerspectiveMatrix((Radian<T>) fovy, aspectRatio, znear, zfar);
+		}
+
+		template<class T>
 		Matrix<T, 4> CreateOrthoMatrix(T left, T right, T top, T bottom, T znear, T zfar) noexcept
 		{
 			Matrix<T, 4> result;
