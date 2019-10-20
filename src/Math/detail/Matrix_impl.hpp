@@ -128,7 +128,7 @@ public:
 
 	template<typename EnabledFor3x3OrGreater = std::enable_if_t<(N >= 3)>>
 	Matrix(const RotationTag&, Quaternion<T> q) noexcept
-		: type(q)
+		: Matrix(q)
 	{ }
 
 	template<typename EnabledFor4x4 = std::enable_if_t<(N == 4)>>
@@ -164,7 +164,7 @@ public:
 	}
 
 	template<class... Us, typename = std::enable_if_t<
-		!Meta::IsVariadicTypeOf<type, Us...> &&
+		!Meta::IsVariadicTypeOf<Matrix, Us...> &&
 		!detail::HasTag_v<Us...> &&
 		detail::Span_v<Us...> == ElementCount>>
 	Matrix(Us&&... values) noexcept
@@ -252,14 +252,14 @@ public:
 
 public:
 	template<class... Us, typename = std::enable_if_t<detail::Span_v<Us...> == ElementCount>>
-	constexpr type& Reset(Us&&... values) noexcept
+	constexpr Matrix& Reset(Us&&... values) noexcept
 	{
 		detail::SpanConstructor<T>::Construct(std::begin(Values), std::forward<Us>(values)...);
 
 		return *this;
 	}
 
-	constexpr type& Fill(T value) noexcept
+	constexpr Matrix& Fill(T value) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			at(n) = value;
@@ -267,7 +267,7 @@ public:
 		return *this;
 	}
 
-	constexpr type& MakeIdentity() noexcept
+	constexpr Matrix& MakeIdentity() noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			at(n) = T(0);
@@ -279,7 +279,7 @@ public:
 	}
 
 	template<typename EnabledFor3x3 = std::enable_if_t<(N == 3)>>
-	type& MakeTRS(Vector<T, 2> translation, Radian<T> rotation, Vector<T, 2> scale) noexcept
+	Matrix& MakeTRS(Vector<T, 2> translation, Radian<T> rotation, Vector<T, 2> scale) noexcept
 	{
 		MakeRotation(std::move(rotation));
 
@@ -292,7 +292,7 @@ public:
 	}
 
 	template<typename EnabledFor4x4 = std::enable_if_t<(N == 4)>>
-	type& MakeTRS(Vector<T, 2> translation, Quaternion<T> rotation, Vector<T, 3> scale) noexcept
+	Matrix& MakeTRS(Vector<T, 2> translation, Quaternion<T> rotation, Vector<T, 3> scale) noexcept
 	{
 		MakeRotation(std::move(rotation));
 
@@ -306,7 +306,7 @@ public:
 	}
 
 	template<typename EnabledFor3x3OrGreater = std::enable_if_t<(N >= 3)>>
-	type& MakeXRotation(Radian<T> phi) noexcept
+	Matrix& MakeXRotation(Radian<T> phi) noexcept
 	{
 		MakeIdentity();
 
@@ -321,7 +321,7 @@ public:
 	}
 
 	template<typename EnabledFor3x3OrGreater = std::enable_if_t<(N >= 3)>>
-	type& MakeYRotation(Radian<T> theta) noexcept
+	Matrix& MakeYRotation(Radian<T> theta) noexcept
 	{
 		MakeIdentity();
 
@@ -335,7 +335,7 @@ public:
 		return *this;
 	}
 
-	type& MakeZRotation(Radian<T> psi) noexcept
+	Matrix& MakeZRotation(Radian<T> psi) noexcept
 	{
 		MakeIdentity();
 
@@ -349,19 +349,19 @@ public:
 		return *this;
 	}
 
-	type& MakeRotation(Radian<T> rotation) noexcept
+	Matrix& MakeRotation(Radian<T> rotation) noexcept
 	{
 		return MakeZRotation(std::move(rotation));
 	}
 
 	template<typename EnabledFor3x3OrGreater = std::enable_if_t<(N >= 3)>>
-	type& MakeRotation(Radian<T> pitch, Radian<T> heading, Radian<T> roll) noexcept
+	Matrix& MakeRotation(Radian<T> pitch, Radian<T> heading, Radian<T> roll) noexcept
 	{
 		return MakeRotation(Epic::Quaternion<T> { std::move(pitch), std::move(heading), std::move(roll) });
 	}
 
 	template<typename EnabledFor3x3OrGreater = std::enable_if_t<(N >= 3)>>
-	type& MakeRotation(Vector<T, 3> axis, Radian<T> angle) noexcept
+	Matrix& MakeRotation(Vector<T, 3> axis, Radian<T> angle) noexcept
 	{
 		MakeIdentity();
 
@@ -395,7 +395,7 @@ public:
 	}
 
 	template<typename EnabledFor3x3OrGreater = std::enable_if_t<(N >= 3)>>
-	type& MakeRotation(Quaternion<T> q) noexcept
+	Matrix& MakeRotation(Quaternion<T> q) noexcept
 	{
 		MakeIdentity();
 
@@ -430,7 +430,7 @@ public:
 	}
 
 	template<typename EnabledFor4x4 = std::enable_if_t<(N == 4)>>
-	type& LookAt(
+	Matrix& LookAt(
 		Vector<T, 3> target,
 		Vector<T, 3> eye = { T(0), T(0), T(0) },
 		Vector<T, 3> up = { T(0), T(1), T(0) }) noexcept
@@ -451,7 +451,7 @@ public:
 	}
 
 	template<typename EnabledFor4x4 = std::enable_if_t<(N == 4)>>
-	type& LookAt(
+	Matrix& LookAt(
 		Vector<T, 4> target,
 		Vector<T, 4> eye = { T(0), T(0), T(0), T(0) },
 		Vector<T, 4> up = { T(0), T(1), T(0), T(0) }) noexcept
@@ -472,7 +472,7 @@ public:
 	}
 
 	template<class... Us, typename = std::enable_if_t<(detail::Span_v<Us...> <= column_type::Size)>>
-	type& MakeTranslation(Us&&... values) noexcept
+	Matrix& MakeTranslation(Us&&... values) noexcept
 	{
 		constexpr size_t SpanSize = detail::Span_v<Us...>;
 		constexpr size_t ColumnIndex = ElementCount - column_type::Size;
@@ -488,7 +488,7 @@ public:
 	}
 
 	template<class... Us, typename = std::enable_if_t<(detail::Span_v<Us...> <= column_type::Size)>>
-	type& MakeScale(Us&&... values) noexcept
+	Matrix& MakeScale(Us&&... values) noexcept
 	{
 		constexpr size_t SpanSize = detail::Span_v<Us...>;
 
@@ -574,9 +574,9 @@ public:
 		return CalculateDeterminant<ColumnCount>();
 	}
 
-	type& Compose(const type& mat) noexcept
+	Matrix& Compose(const Matrix& mat) noexcept
 	{
-		type result = Zero;
+		Matrix result = Zero;
 
 		for (size_t i = 0; i < ColumnCount; ++i)
 		{
@@ -587,7 +587,7 @@ public:
 		return (*this = result);
 	}
 
-	type& Transpose() noexcept
+	Matrix& Transpose() noexcept
 	{
 		for (size_t i = 0; i < ColumnCount; ++i)
 		{
@@ -604,12 +604,12 @@ public:
 		return *this;
 	}
 
-	type& InvertRigid() noexcept
+	Matrix& InvertRigid() noexcept
 	{
 		return TransposeInvertRigid().Transpose();
 	}
 
-	type& Invert() noexcept
+	Matrix& Invert() noexcept
 	{
 		const T det = Determinant();
 		if (det == T(0))
@@ -635,7 +635,7 @@ public:
 
 		else if constexpr (ColumnCount == 3)
 		{
-			type adj;
+			Matrix adj;
 
 			adj.Values[0] = (Values[4] * Values[8]) - (Values[5] * Values[7]);
 			adj.Values[1] = -(Values[1] * Values[8]) + (Values[2] * Values[7]);
@@ -653,8 +653,8 @@ public:
 
 		else
 		{
-			type lower = Identity;
-			type& upper = *this;
+			Matrix lower = Identity;
+			Matrix& upper = *this;
 
 			for (size_t i = 0; i < ColumnCount; ++i)
 			{
@@ -714,7 +714,7 @@ public:
 		return *this;
 	}
 
-	type& TransposeInvertRigid() noexcept
+	Matrix& TransposeInvertRigid() noexcept
 	{
 		for (size_t i = 0; i < ColumnCount - 1; ++i)
 			Columns[i][column_type::Size - 1] = -Columns[i].Dot(Columns[ColumnCount - 1]);
@@ -725,29 +725,29 @@ public:
 		return *this;
 	}
 
-	type& TransposeInvert() noexcept
+	Matrix& TransposeInvert() noexcept
 	{
 		Invert();
 
 		return Transpose();
 	}
 
-	template<size_t I = 0, size_t N = ColumnCount>
-	Matrix<T, N> Slice() const noexcept
+	template<size_t I = 0, size_t M = ColumnCount>
+	Matrix<T, M> Slice() const noexcept
 	{
-		static_assert(N > 1, "Resultant Matrix must be at least 2x2");
-		static_assert((I + N) <= ColumnCount, "Slice parameters are out of bounds");
+		static_assert(M > 1, "Resultant Matrix must be at least 2x2");
+		static_assert((I + M) <= ColumnCount, "Slice parameters are out of bounds");
 
-		Matrix<T, N> result;
+		Matrix<T, M> result;
 		size_t src = (ColumnCount * I) + I;
 		size_t dest = 0;
 
-		for (size_t i = 0; i < N; ++i)
+		for (size_t i = 0; i < M; ++i)
 		{
-			for (size_t j = 0; j < N; ++j)
+			for (size_t j = 0; j < M; ++j)
 				result.Values[dest++] = Values[src++];
 
-			src += ColumnCount - N;
+			src += ColumnCount - M;
 		}
 
 		return result;
@@ -786,40 +786,40 @@ public:
 	}
 
 public:
-	static type CompositeOf(const type& matA, const type& matB) noexcept
+	static Matrix CompositeOf(const Matrix& matA, const Matrix& matB) noexcept
 	{
-		return type(matA).Compose(matB);
+		return Matrix(matA).Compose(matB);
 	}
 
-	static type TransposeOf(const type& mat) noexcept
+	static Matrix TransposeOf(const Matrix& mat) noexcept
 	{
-		return type(mat).Transpose();
+		return Matrix(mat).Transpose();
 	}
 
-	static type RigidInverseOf(const type& mat) noexcept
+	static Matrix RigidInverseOf(const Matrix& mat) noexcept
 	{
-		return type(mat).InvertRigid();
+		return Matrix(mat).InvertRigid();
 	}
 
-	static type InverseOf(const type& mat) noexcept
+	static Matrix InverseOf(const Matrix& mat) noexcept
 	{
-		return type(mat).Invert();
+		return Matrix(mat).Invert();
 	}
 
-	static type TransposedRigidInverseOf(const type& mat) noexcept
+	static Matrix TransposedRigidInverseOf(const Matrix& mat) noexcept
 	{
-		return type(mat).TransposeInvertRigid();
+		return Matrix(mat).TransposeInvertRigid();
 	}
 
-	static type TransposedInverseOf(const type& mat) noexcept
+	static Matrix TransposedInverseOf(const Matrix& mat) noexcept
 	{
-		return type(mat).TransposeInvert();
+		return Matrix(mat).TransposeInvert();
 	}
 
 public:
-	type operator - () const noexcept
+	Matrix operator - () const noexcept
 	{
-		type result;
+		Matrix result;
 
 		for (size_t n = 0; n < ElementCount; ++n)
 			result.Values[n] = -Values[n];
@@ -827,40 +827,40 @@ public:
 		return result;
 	}
 
-	type operator ~ () const noexcept
+	Matrix operator ~ () const noexcept
 	{
-		return type::RigidInverseOf(*this);
+		return Matrix::RigidInverseOf(*this);
 	}
 
 public:
 	#pragma region Assignment Operators
 
-	type& operator = (const ZeroesTag&) noexcept
+	Matrix& operator = (const ZeroesTag&) noexcept
 	{
 		return Fill(T(0));
 	}
 
-	type& operator = (const OnesTag&) noexcept
+	Matrix& operator = (const OnesTag&) noexcept
 	{
 		return Fill(T(1));
 	}
 
-	type& operator = (const IdentityTag&) noexcept
+	Matrix& operator = (const IdentityTag&) noexcept
 	{
 		return MakeIdentity();
 	}
 
-	type& operator *= (const type& m) noexcept
+	Matrix& operator *= (const Matrix& m) noexcept
 	{
 		return Compose(m);
 	}
 
-	type& operator = (T value) noexcept
+	Matrix& operator = (T value) noexcept
 	{
 		return Fill(std::move(value));
 	}
 
-	type& operator += (T value) noexcept
+	Matrix& operator += (T value) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] += value;
@@ -868,7 +868,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (T value) noexcept
+	Matrix& operator -= (T value) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] -= value;
@@ -876,7 +876,7 @@ public:
 		return *this;
 	}
 
-	type& operator *= (T value) noexcept
+	Matrix& operator *= (T value) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] *= value;
@@ -884,7 +884,7 @@ public:
 		return *this;
 	}
 
-	type& operator /= (T value) noexcept
+	Matrix& operator /= (T value) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] /= value;
@@ -892,7 +892,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (const T(&values)[ElementCount]) noexcept
+	Matrix& operator = (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] = values[n];
@@ -900,7 +900,7 @@ public:
 		return *this;
 	}
 
-	type& operator += (const T(&values)[ElementCount]) noexcept
+	Matrix& operator += (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] += values[n];
@@ -908,7 +908,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator -= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] -= values[n];
@@ -916,7 +916,7 @@ public:
 		return *this;
 	}
 
-	type& operator *= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator *= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] *= values[n];
@@ -924,7 +924,7 @@ public:
 		return *this;
 	}
 
-	type& operator /= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator /= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] /= values[n];
@@ -932,7 +932,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (const type& mat) noexcept
+	Matrix& operator = (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] = mat.Values[n];
@@ -940,7 +940,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (type&& mat) noexcept
+	Matrix& operator = (Matrix&& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] = mat.Values[n];
@@ -948,7 +948,7 @@ public:
 		return *this;
 	}
 
-	type& operator += (const type& mat) noexcept
+	Matrix& operator += (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] += mat.Values[n];
@@ -956,7 +956,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (const type& mat) noexcept
+	Matrix& operator -= (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] -= mat.Values[n];
@@ -970,7 +970,7 @@ public:
 	#pragma region Logic Assignment Operators
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator |= (T value) noexcept
+	Matrix& operator |= (T value) noexcept
 	{
 		for (size_t n = 0; n < ColumnCount; ++n)
 			Columns[n] |= value;
@@ -979,7 +979,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator &= (T value) noexcept
+	Matrix& operator &= (T value) noexcept
 	{
 		for (size_t n = 0; n < ColumnCount; ++n)
 			Columns[n] &= value;
@@ -988,7 +988,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator ^= (T value) noexcept
+	Matrix& operator ^= (T value) noexcept
 	{
 		for (size_t n = 0; n < ColumnCount; ++n)
 			Columns[n] ^= value;
@@ -997,7 +997,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator %= (T value) noexcept
+	Matrix& operator %= (T value) noexcept
 	{
 		for (size_t n = 0; n < ColumnCount; ++n)
 			Columns[n] %= value;
@@ -1006,7 +1006,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator <<= (T value) noexcept
+	Matrix& operator <<= (T value) noexcept
 	{
 		for (size_t n = 0; n < ColumnCount; ++n)
 			Columns[n] <<= value;
@@ -1015,7 +1015,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator >>= (T value) noexcept
+	Matrix& operator >>= (T value) noexcept
 	{
 		for (size_t n = 0; n < ColumnCount; ++n)
 			Columns[n] >>= value;
@@ -1024,7 +1024,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator |= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator |= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] |= values[n];
@@ -1033,7 +1033,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator &= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator &= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] &= values[n];
@@ -1042,7 +1042,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator ^= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator ^= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] ^= values[n];
@@ -1051,7 +1051,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator %= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator %= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] %= values[n];
@@ -1060,7 +1060,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator <<= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator <<= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] <<= values[n];
@@ -1069,7 +1069,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator >>= (const T(&values)[ElementCount]) noexcept
+	Matrix& operator >>= (const T(&values)[ElementCount]) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] >>= values[n];
@@ -1078,7 +1078,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator |= (const type& mat) noexcept
+	Matrix& operator |= (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] |= mat.Values[n];
@@ -1087,7 +1087,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator &= (const type& mat) noexcept
+	Matrix& operator &= (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] &= mat.Values[n];
@@ -1096,7 +1096,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator ^= (const type& mat) noexcept
+	Matrix& operator ^= (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] ^= mat.Values[n];
@@ -1105,7 +1105,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator %= (const type& mat) noexcept
+	Matrix& operator %= (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] %= mat.Values[n];
@@ -1114,7 +1114,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator <<= (const type& mat) noexcept
+	Matrix& operator <<= (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] <<= mat.Values[n];
@@ -1123,7 +1123,7 @@ public:
 	}
 
 	template<typename = std::enable_if_t<std::is_integral_v<T>>>
-	type& operator >>= (const type& mat) noexcept
+	Matrix& operator >>= (const Matrix& mat) noexcept
 	{
 		for (size_t n = 0; n < ElementCount; ++n)
 			Values[n] >>= mat.Values[n];
@@ -1136,79 +1136,79 @@ public:
 public:
 	#pragma region Arithmetic Operators
 
-	type operator * (const type& mat) const noexcept
+	Matrix operator * (const Matrix& mat) const noexcept
 	{
-		return type::CompositeOf(*this, mat);
+		return Matrix::CompositeOf(*this, mat);
 	}
 
-	type operator + (T value) const noexcept
+	Matrix operator + (T value) const noexcept
 	{
-		return type(*this) += std::move(value);
+		return Matrix(*this) += std::move(value);
 	}
 
-	type operator - (T value) const noexcept
+	Matrix operator - (T value) const noexcept
 	{
-		return type(*this) -= std::move(value);
+		return Matrix(*this) -= std::move(value);
 	}
 
-	type operator * (T value) const noexcept
+	Matrix operator * (T value) const noexcept
 	{
-		return type(*this) *= std::move(value);
+		return Matrix(*this) *= std::move(value);
 	}
 
-	type operator / (T value) const noexcept
+	Matrix operator / (T value) const noexcept
 	{
-		return type(*this) /= std::move(value);
+		return Matrix(*this) /= std::move(value);
 	}
 	
-	type operator + (const T(&values)[ElementCount]) const noexcept
+	Matrix operator + (const T(&values)[ElementCount]) const noexcept
 	{
-		return type(*this) += values;
+		return Matrix(*this) += values;
 	}
 
-	type operator - (const T(&values)[ElementCount]) const noexcept
+	Matrix operator - (const T(&values)[ElementCount]) const noexcept
 	{
-		return type(*this) -= values;
+		return Matrix(*this) -= values;
 	}
 
-	type operator * (const T(&values)[ElementCount]) const noexcept
+	Matrix operator * (const T(&values)[ElementCount]) const noexcept
 	{
-		return type(*this) *= values;
+		return Matrix(*this) *= values;
 	}
 
-	type operator / (const T(&values)[ElementCount]) const noexcept
+	Matrix operator / (const T(&values)[ElementCount]) const noexcept
 	{
-		return type(*this) /= values;
+		return Matrix(*this) /= values;
 	}
 
-	type operator + (const type& mat) const noexcept
+	Matrix operator + (const Matrix& mat) const noexcept
 	{
-		return type(*this) += mat;
+		return Matrix(*this) += mat;
 	}
 
-	type operator - (const type& mat) const noexcept
+	Matrix operator - (const Matrix& mat) const noexcept
 	{
-		return type(*this) -= mat;
+		return Matrix(*this) -= mat;
 	}
 
-	friend type operator + (T value, const type& mat) noexcept
+	friend Matrix operator + (T value, const Matrix& mat) noexcept
 	{
-		return type(mat) += std::move(value);
+		return Matrix(mat) += std::move(value);
 	}
 
-	friend type operator - (T value, const type& mat) noexcept
+	friend Matrix operator - (T value, const Matrix& mat) noexcept
 	{
-		return type(mat) -= std::move(value);
+		return Matrix(mat) -= std::move(value);
 	}
 
-	friend type operator * (T value, const type& mat) noexcept
+	friend Matrix operator * (T value, const Matrix& mat) noexcept
 	{
-		return type(mat) *= std::move(value);
+		return Matrix(mat) *= std::move(value);
 	}
 
-	friend type operator / (T value, const type& mat) noexcept
+	friend Matrix operator / (T value, const Matrix& mat) noexcept
 	{
-		return type(mat) /= std::move(value);
+		return Matrix(mat) /= std::move(value);
 	}
 	
 	#pragma endregion
@@ -1313,25 +1313,6 @@ namespace Epic
 	}
 
 	template<class T, size_t N>
-	inline std::wostream& operator << (std::wostream& stream, const Matrix<T, N>& mat)
-	{
-		stream << L"[\n";
-		stream << std::fixed;
-
-		for (size_t n = 0; n < N; ++n)
-		{
-			stream << L' ' << mat[n];
-			if (n < N - 1) stream << L',';
-			stream << L'\n';
-		}
-			
-		stream << std::defaultfloat;
-		stream << L']';
-
-		return stream;
-	}
-
-	template<class T, size_t N>
 	inline std::istream& operator >> (std::istream& stream, Matrix<T, N>& mat)
 	{
 		if (stream.peek() == '[')
@@ -1346,26 +1327,6 @@ namespace Epic
 		}
 
 		if (stream.peek() == ']')
-			stream.ignore(1);
-
-		return stream;
-	}
-
-	template<class T, size_t N>
-	inline std::wistream& operator >> (std::wistream& stream, Matrix<T, N>& mat)
-	{
-		if (stream.peek() == L'[')
-			stream.ignore(1);
-
-		for (size_t n = 0; n < N; ++n)
-		{
-			if (n > 0 && stream.peek() == L',')
-				stream.ignore(1);
-
-			stream >> mat[n];
-		}
-
-		if (stream.peek() == L']')
 			stream.ignore(1);
 
 		return stream;
