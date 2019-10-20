@@ -16,6 +16,7 @@
 #include "VectorSwizzler_decl.h"
 
 #include <cassert>
+#include <iostream>
 
 #include "../../Meta/Sequence.hpp"
 #include "Vector_decl.h"
@@ -60,14 +61,30 @@ public:
 		return result;
 	}
 
+	VectorSwizzler& Assign(Epic::Vector<T, sizeof...(Indices)>& vec)
+	{
+		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operation.");
+
+		Meta::ForEach2<IndexSeq, Meta::MakeSequence<size_t, sizeof...(Indices)>>
+			::Call([&](size_t i, size_t j) { m_Values[i] = vec[j]; });
+
+		return *this;
+	}
+
 	vector_type operator() () const noexcept
 	{
 		return ToVector();
 	}
 
+	template<typename = std::enable_if_t<(sizeof...(Indices) == 1)>>
+	operator T() const noexcept
+	{
+		return Get<0>();
+	}
+
 public:
 	template<class Function, class... Args>
-	type& Iterate(Function fn, Args&&... args)
+	VectorSwizzler& Iterate(Function fn, Args&&... args)
 	{
 		Meta::ForEach<IndexSeq>::Call(fn, args...);
 
@@ -75,7 +92,7 @@ public:
 	}
 
 	template<class Function, class... Args>
-	const type& Iterate(Function fn, Args&&... args) const
+	const VectorSwizzler& Iterate(Function fn, Args&&... args) const
 	{
 		Meta::ForEach<IndexSeq>::Call(fn, args...);
 
@@ -83,7 +100,7 @@ public:
 	}
 
 	template<class Function, class... Args>
-	type& IterateN(Function fn, Args&&... args)
+	VectorSwizzler& IterateN(Function fn, Args&&... args)
 	{
 		Meta::ForEach2<IndexSeq, VectorSeq>::Call(fn, args...);
 
@@ -91,17 +108,41 @@ public:
 	}
 
 	template<class Function, class... Args>
-	const type& IterateN(Function fn, Args&&... args) const
+	const VectorSwizzler& IterateN(Function fn, Args&&... args) const
 	{
 		Meta::ForEach2<IndexSeq, VectorSeq>::Call(fn, args...);
 
 		return *this;
 	}
+
+private:
+	template<size_t I>
+	constexpr T Get() const
+	{
+		return m_Values[Getter<I, 0, Indices...>::Get()];
+	}
+
+	template<size_t I, size_t J, size_t... Rest>
+	struct Getter { };
+
+	template<size_t I, size_t J, size_t Current, size_t... Rest>
+	struct Getter<I, J, Current, Rest...>
+	{
+		constexpr static size_t Get()
+		{
+			static_assert(I < sizeof...(Indices));
+
+			if constexpr (J >= I)
+				return Current;
+			else
+				return Getter<I, I + 1, Rest...>::Get();
+		}
+	};
 
 public:
 	#pragma region Assignment Operators
 
-	type& operator = (T value) noexcept
+	VectorSwizzler& operator = (T value) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -110,7 +151,7 @@ public:
 		return *this;
 	}
 
-	type& operator += (T value) noexcept
+	VectorSwizzler& operator += (T value) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -119,7 +160,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (T value) noexcept
+	VectorSwizzler& operator -= (T value) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -128,7 +169,7 @@ public:
 		return *this;
 	}
 
-	type& operator *= (T value) noexcept
+	VectorSwizzler& operator *= (T value) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -137,7 +178,7 @@ public:
 		return *this;
 	}
 
-	type& operator /= (T value) noexcept
+	VectorSwizzler& operator /= (T value) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -146,7 +187,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (const T(&values)[Size]) noexcept
+	VectorSwizzler& operator = (const T(&values)[Size]) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -155,7 +196,7 @@ public:
 		return *this;
 	}
 
-	type& operator += (const T(&values)[Size]) noexcept
+	VectorSwizzler& operator += (const T(&values)[Size]) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -164,7 +205,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (const T(&values)[Size]) noexcept
+	VectorSwizzler& operator -= (const T(&values)[Size]) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -173,7 +214,7 @@ public:
 		return *this;
 	}
 
-	type& operator *= (const T(&values)[Size]) noexcept
+	VectorSwizzler& operator *= (const T(&values)[Size]) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -182,7 +223,7 @@ public:
 		return *this;
 	}
 
-	type& operator /= (const T(&values)[Size]) noexcept
+	VectorSwizzler& operator /= (const T(&values)[Size]) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -191,7 +232,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (const vector_type& vec) noexcept
+	VectorSwizzler& operator = (const vector_type& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -200,7 +241,7 @@ public:
 		return *this;
 	}
 
-	type& operator += (const vector_type& vec) noexcept
+	VectorSwizzler& operator += (const vector_type& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -209,7 +250,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (const vector_type& vec) noexcept
+	VectorSwizzler& operator -= (const vector_type& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -218,7 +259,7 @@ public:
 		return *this;
 	}
 
-	type& operator *= (const vector_type& vec) noexcept
+	VectorSwizzler& operator *= (const vector_type& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -227,7 +268,7 @@ public:
 		return *this;
 	}
 
-	type& operator /= (const vector_type& vec) noexcept
+	VectorSwizzler& operator /= (const vector_type& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -237,7 +278,7 @@ public:
 	}
 
 	template<size_t M, size_t... Is, typename = std::enable_if_t<(sizeof...(Is) == Size)>>
-	type& operator = (const VectorSwizzler<T, M, Is...>& vec) noexcept
+	VectorSwizzler& operator = (const VectorSwizzler<T, M, Is...>& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -248,7 +289,7 @@ public:
 	}
 
 	template<size_t M, size_t... Is, typename = std::enable_if_t<(sizeof...(Is) == Size)>>
-	type& operator += (const VectorSwizzler<T, M, Is...>& vec) noexcept
+	VectorSwizzler& operator += (const VectorSwizzler<T, M, Is...>& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -259,7 +300,7 @@ public:
 	}
 
 	template<size_t M, size_t... Is, typename = std::enable_if_t<(sizeof...(Is) == Size)>>
-	type& operator -= (const VectorSwizzler<T, M, Is...>& vec) noexcept
+	VectorSwizzler& operator -= (const VectorSwizzler<T, M, Is...>& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -270,7 +311,7 @@ public:
 	}
 
 	template<size_t M, size_t... Is, typename = std::enable_if_t<(sizeof...(Is) == Size)>>
-	type& operator *= (const VectorSwizzler<T, M, Is...>& vec) noexcept
+	VectorSwizzler& operator *= (const VectorSwizzler<T, M, Is...>& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -281,7 +322,7 @@ public:
 	}
 
 	template<size_t M, size_t... Is, typename = std::enable_if_t<(sizeof...(Is) == Size)>>
-	type& operator /= (const VectorSwizzler<T, M, Is...>& vec) noexcept
+	VectorSwizzler& operator /= (const VectorSwizzler<T, M, Is...>& vec) noexcept
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operator.");
 
@@ -335,22 +376,22 @@ public:
 		return ToVector() / vec;
 	}
 
-	friend vector_type operator + (T value, type vec) noexcept
+	friend vector_type operator + (T value, VectorSwizzler vec) noexcept
 	{
 		return vector_type().Fill(std::move(value)) + vec.ToVector();
 	}
 
-	friend vector_type operator - (T value, type vec) noexcept
+	friend vector_type operator - (T value, VectorSwizzler vec) noexcept
 	{
 		return vector_type().Fill(std::move(value)) - vec.ToVector();
 	}
 
-	friend vector_type operator * (T value, type vec) noexcept
+	friend vector_type operator * (T value, VectorSwizzler vec) noexcept
 	{
 		return vector_type().Fill(std::move(value)) * vec.ToVector();
 	}
 
-	friend vector_type operator / (T value, type vec) noexcept
+	friend vector_type operator / (T value, VectorSwizzler vec) noexcept
 	{
 		return vector_type().Fill(std::move(value)) / vec.ToVector();
 	}
@@ -361,3 +402,26 @@ private:
 	template<class, size_t, size_t...>
 	friend class VectorSwizzler;
 };
+
+//////////////////////////////////////////////////////////////////////////////
+
+// Friend Operators
+namespace Epic::detail
+{
+	template<class T, size_t N, size_t... Indices>
+	inline std::ostream& operator << (std::ostream& stream, const VectorSwizzler<T, N, Indices...>& vec)
+	{
+		return stream << vec();
+	}
+
+	template<class T, size_t N, size_t... Indices>
+	inline std::istream& operator >> (std::istream& stream, VectorSwizzler<T, N, Indices...>& vec)
+	{
+		Vector<T, sizeof...(Indices)> temp;
+		stream >> temp;
+
+		vec.Assign(temp);
+
+		return stream;
+	}
+}
