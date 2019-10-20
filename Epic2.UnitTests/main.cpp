@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Math/AngleTests.hpp"
+#include "Math/VectorTests.hpp"
 
 int main(int argc, char **argv) 
 {

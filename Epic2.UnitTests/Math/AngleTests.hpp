@@ -7,9 +7,6 @@ using Epic::Radian;
 
 class RadianTests : public testing::Test
 {
-protected:
-	//void SetUp() override { }
-	//void TearDown() override { }
 };
 
 TEST_F(RadianTests, Constructor_WithConvertibleRadian_HasConvertedValue)
@@ -149,9 +146,6 @@ TEST_F(RadianTests, NormalOf_NormalizesValue)
 
 class DegreeTests : public testing::Test
 {
-protected:
-	//void SetUp() override { }
-	//void TearDown() override { }
 };
 
 TEST_F(DegreeTests, Constructor_WithConvertibleDegree_HasConvertedValue)
