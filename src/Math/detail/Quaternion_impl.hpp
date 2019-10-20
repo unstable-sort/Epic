@@ -123,7 +123,7 @@ public:
 	}
 
 public:
-	type& Reset(T xv, T yv, T zv, T wv) noexcept
+	Quaternion& Reset(T xv, T yv, T zv, T wv) noexcept
 	{
 		Values[0] = std::move(xv);
 		Values[1] = std::move(yv);
@@ -133,33 +133,33 @@ public:
 		return *this;
 	}
 
-	type& MakeIdentity() noexcept
+	Quaternion& MakeIdentity() noexcept
 	{
 		return Reset(T(0), T(0), T(0), T(1));
 	}
 
-	type& MakeXRotation(Radian<T> phi) noexcept
+	Quaternion& MakeXRotation(Radian<T> phi) noexcept
 	{
 		const auto[sPhi, cPhi] = (phi / T(2)).SinCos();
 		
 		return Reset(sPhi, T(0), T(0), cPhi);
 	}
 
-	type& MakeYRotation(Radian<T> theta) noexcept
+	Quaternion& MakeYRotation(Radian<T> theta) noexcept
 	{
 		const auto[sTheta, cTheta] = (theta / T(2)).SinCos();
 
 		return Reset(T(0), sTheta, T(0), cTheta);
 	}
 
-	type& MakeZRotation(Radian<T> psi) noexcept
+	Quaternion& MakeZRotation(Radian<T> psi) noexcept
 	{
 		const auto[sPsi, cPsi] = (psi / T(2)).SinCos();
 
 		return Reset(T(0), T(0), sPsi, cPsi);
 	}
 
-	type& MakeRotation(Radian<T> pitch, Radian<T> heading, Radian<T> roll) noexcept
+	Quaternion& MakeRotation(Radian<T> pitch, Radian<T> heading, Radian<T> roll) noexcept
 	{
 		const auto[sp, cp] = (pitch / T(2)).SinCos();
 		const auto[sh, ch] = (heading / T(2)).SinCos();
@@ -174,7 +174,7 @@ public:
 		);
 	}
 
-	type& MakeRotation(T xv, T yv, T zv, Radian<T> angle) noexcept
+	Quaternion& MakeRotation(T xv, T yv, T zv, Radian<T> angle) noexcept
 	{
 		auto t = xv * xv + yv * yv + zv * zv;
 		if (t == T(0))
@@ -186,12 +186,12 @@ public:
 		return Reset(xv * t, yv * t, zv * t, cAngle);
 	}
 
-	type& MakeRotation(Vector<T, 3> axis, Radian<T> angle) noexcept
+	Quaternion& MakeRotation(Vector<T, 3> axis, Radian<T> angle) noexcept
 	{
 		return MakeRotation(std::move(axis[0]), std::move(axis[1]), std::move(axis[2]), std::move(angle));
 	}
 
-	type& MakeRotation(Vector<T, 4> axis, Radian<T> angle) noexcept
+	Quaternion& MakeRotation(Vector<T, 4> axis, Radian<T> angle) noexcept
 	{
 		return MakeRotation(std::move(axis[0]), std::move(axis[1]), std::move(axis[2]), std::move(angle));
 	}
@@ -291,7 +291,7 @@ public:
 	}
 
 public:
-	constexpr T Dot(type quat) const noexcept
+	constexpr T Dot(Quaternion quat) const noexcept
 	{
 		return (Values[0] * quat.Values[0]) +
 			   (Values[1] * quat.Values[1]) +
@@ -309,19 +309,19 @@ public:
 		return { static_cast<T>(std::sqrt(MagnitudeSq())) };
 	}
 
-	type& Normalize() noexcept
+	Quaternion& Normalize() noexcept
 	{
 		return *this /= Magnitude();
 	}
 
-	type& NormalizeSafe() noexcept
+	Quaternion& NormalizeSafe() noexcept
 	{
 		const auto m = Magnitude();
 
 		return (m == T(0)) ? (*this) : (*this /= m);
 	}
 
-	type& Concatenate(type quat) noexcept
+	Quaternion& Concatenate(Quaternion quat) noexcept
 	{
 		const auto tx = Values[0];
 		const auto ty = Values[1];
@@ -335,7 +335,7 @@ public:
 		return *this;
 	}
 
-	type& Conjugate() noexcept
+	Quaternion& Conjugate() noexcept
 	{
 		Values[0] = -Values[0];
 		Values[1] = -Values[1];
@@ -344,17 +344,17 @@ public:
 		return *this;
 	}
 
-	type& Invert() noexcept
+	Quaternion& Invert() noexcept
 	{
 		return (Conjugate() /= MagnitudeSq());
 	}
 
-	type Log() const noexcept
+	Quaternion Log() const noexcept
 	{
 		const T a = static_cast<T>(std::acos(Values[3]));
 		const T sina = static_cast<T>(std::sin(a));
 		
-		type result(T(0), T(0), T(0), T(0));
+		Quaternion result(T(0), T(0), T(0), T(0));
 
 		if (sina > z)
 		{
@@ -366,7 +366,7 @@ public:
 		return result;
 	}
 
-	type Exp() const noexcept
+	Quaternion Exp() const noexcept
 	{
 		const T a = static_cast<T>(
 			std::sqrt((Values[0] * Values[0]) +
@@ -376,7 +376,7 @@ public:
 		const T sina = static_cast<T>(std::sin(a));
 		const T cosa = static_cast<T>(std::cos(a));
 		
-		type result(T(0), T(0), T(0), cosa);
+		Quaternion result(T(0), T(0), T(0), cosa);
 
 		if (a > T(0))
 		{
@@ -389,40 +389,40 @@ public:
 	}
 
 public:
-	static type NormalOf(type quat) noexcept
+	static Quaternion NormalOf(Quaternion quat) noexcept
 	{
-		return type(std::move(quat)).Normalize();
+		return Quaternion(std::move(quat)).Normalize();
 	}
 
-	static type SafeNormalOf(type quat) noexcept
+	static Quaternion SafeNormalOf(Quaternion quat) noexcept
 	{
-		return type(std::move(quat)).NormalizeSafe();
+		return Quaternion(std::move(quat)).NormalizeSafe();
 	}
 
-	static type ConcatenationOf(type q, type r) noexcept
+	static Quaternion ConcatenationOf(Quaternion q, Quaternion r) noexcept
 	{
-		return type(std::move(q)).Concatenate(std::move(r));
+		return Quaternion(std::move(q)).Concatenate(std::move(r));
 	}
 
-	static type ConjugateOf(type quat) noexcept
+	static Quaternion ConjugateOf(Quaternion quat) noexcept
 	{
-		return type(std::move(quat)).Conjugate();
+		return Quaternion(std::move(quat)).Conjugate();
 	}
 
-	static type InverseOf(type quat) noexcept
+	static Quaternion InverseOf(Quaternion quat) noexcept
 	{
-		return type(std::move(quat)).Invert();
+		return Quaternion(std::move(quat)).Invert();
 	}
 
 public:
-	static auto Lerp(type from, type to, T t) noexcept
+	static auto Lerp(Quaternion from, Quaternion to, T t) noexcept
 	{
 		return NormalOf((std::move(from) * (T(1) - t)) + (std::move(to) * t));
 	}
 
-	static auto SlerpSR(type from, type to, T t) noexcept
+	static auto SlerpSR(Quaternion from, Quaternion to, T t) noexcept
 	{
-		type qt = std::move(to);
+		Quaternion qt = std::move(to);
 		auto dot = from.Dot(qt);
 
 		// When from and to > 90 deg apart, perform spin reduction
@@ -442,7 +442,7 @@ public:
 		return ((std::move(from) * thetaFrom.Sin()) + (std::move(qt) * thetaTo.Sin())) / theta.Sin();
 	}
 
-	static auto Slerp(type from, type to, T t) noexcept
+	static auto Slerp(Quaternion from, Quaternion to, T t) noexcept
 	{
 		auto dot = from.Dot(to);
 
@@ -456,7 +456,7 @@ public:
 		return ((std::move(from) * thetaFrom.Sin()) + (std::move(to) * thetaTo.Sin())) / theta.Sin();
 	}
 
-	static auto Squad(type from, type to, type a, type b, T t) noexcept
+	static auto Squad(Quaternion from, Quaternion to, Quaternion a, Quaternion b, T t) noexcept
 	{
 		return Slerp(Slerp(std::move(from), std::move(to), t), Slerp(std::move(a), std::move(b), t), T(2) * t * (T(1) - t));
 	}
@@ -473,30 +473,30 @@ public:
 	}
 
 public:
-	type operator - () const noexcept
+	Quaternion operator - () const noexcept
 	{
-		return type::ConjugateOf(*this);
+		return Quaternion::ConjugateOf(*this);
 	}
 
-	type operator ~ () const noexcept
+	Quaternion operator ~ () const noexcept
 	{
-		return type::InverseOf(*this);
+		return Quaternion::InverseOf(*this);
 	}
 
 public:
 	#pragma region Assignment Operators
 
-	type& operator = (const IdentityTag&) noexcept
+	Quaternion& operator = (const IdentityTag&) noexcept
 	{
 		return MakeIdentity();
 	}
 
-	type& operator *= (type quat) noexcept
+	Quaternion& operator *= (Quaternion quat) noexcept
 	{
 		return Concatenate(std::move(quat));
 	}
 
-	type& operator /= (type quat) noexcept
+	Quaternion& operator /= (Quaternion quat) noexcept
 	{
 		// Concatenate(Type::InverseOf(quat))
 
@@ -516,7 +516,7 @@ public:
 		};
 	}
 
-	type& operator *= (T value) noexcept
+	Quaternion& operator *= (T value) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] *= value;
@@ -524,7 +524,7 @@ public:
 		return *this;
 	}
 
-	type& operator /= (T value) noexcept
+	Quaternion& operator /= (T value) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] /= value;
@@ -532,7 +532,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (const T(&values)[Size]) noexcept
+	Quaternion& operator = (const T(&values)[Size]) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] = values[i];
@@ -540,7 +540,7 @@ public:
 		return *this;
 	}
 
-	type& operator += (const T(&values)[Size]) noexcept
+	Quaternion& operator += (const T(&values)[Size]) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] += values[i];
@@ -548,7 +548,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (const T(&values)[Size]) noexcept
+	Quaternion& operator -= (const T(&values)[Size]) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] -= values[i];
@@ -556,7 +556,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (type quat) noexcept
+	Quaternion& operator = (Quaternion quat) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] = quat[i];
@@ -564,7 +564,7 @@ public:
 		return *this;
 	}
 
-	type& operator = (type&& quat) noexcept
+	Quaternion& operator = (Quaternion&& quat) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] = quat[i];
@@ -572,7 +572,7 @@ public:
 		return *this;
 	}
 
-	type& operator += (type quat) noexcept
+	Quaternion& operator += (Quaternion quat) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] += quat[i];
@@ -580,7 +580,7 @@ public:
 		return *this;
 	}
 
-	type& operator -= (type quat) noexcept
+	Quaternion& operator -= (Quaternion quat) noexcept
 	{
 		for (size_t i = 0; i < Size; ++i)
 			Values[i] -= quat[i];
@@ -593,44 +593,44 @@ public:
 public:
 	#pragma region Arithmetic Operators
 
-	type operator * (type quat) const noexcept
+	Quaternion operator * (Quaternion quat) const noexcept
 	{
-		return type(*this) *= std::move(quat);
+		return Quaternion(*this) *= std::move(quat);
 	}
 
-	type operator / (type quat) const noexcept
+	Quaternion operator / (Quaternion quat) const noexcept
 	{
-		return type(*this) /= std::move(quat);
+		return Quaternion(*this) /= std::move(quat);
 	}
 
-	type operator * (T value) const noexcept
+	Quaternion operator * (T value) const noexcept
 	{
-		return type(*this) *= std::move(value);
+		return Quaternion(*this) *= std::move(value);
 	}
 
-	type operator / (T value) const noexcept
+	Quaternion operator / (T value) const noexcept
 	{
-		return type(*this) /= std::move(value);
+		return Quaternion(*this) /= std::move(value);
 	}
 
-	type operator + (const T(&values)[Size]) const noexcept
+	Quaternion operator + (const T(&values)[Size]) const noexcept
 	{
-		return type(*this) += values;
+		return Quaternion(*this) += values;
 	}
 
-	type operator - (const T(&values)[Size]) const noexcept
+	Quaternion operator - (const T(&values)[Size]) const noexcept
 	{
-		return type(*this) -= values;
+		return Quaternion(*this) -= values;
 	}
 
-	type operator + (type quat) const noexcept
+	Quaternion operator + (Quaternion quat) const noexcept
 	{
-		return type(*this) += std::move(quat);
+		return Quaternion(*this) += std::move(quat);
 	}
 
-	type operator - (type quat) const noexcept
+	Quaternion operator - (Quaternion quat) const noexcept
 	{
-		return type(*this) -= std::move(quat);
+		return Quaternion(*this) -= std::move(quat);
 	}
 
 	#pragma endregion
@@ -692,19 +692,6 @@ namespace Epic
 	}
 
 	template<class T>
-	inline std::wostream& operator << (std::wostream& stream, const Quaternion<T>& quat)
-	{
-		stream << L'['
-			   << quat[0] << L", "
-			   << quat[1] << L", "
-			   << quat[2] << L", "
-			   << quat[3]
-			   << L']';
-
-		return stream;
-	}
-
-	template<class T>
 	inline std::istream& operator >> (std::istream& stream, Quaternion<T>& quat)
 	{
 		if (stream.peek() == '[')
@@ -719,26 +706,6 @@ namespace Epic
 		stream >> quat[3];
 
 		if (stream.peek() == ']')
-			stream.ignore(1);
-
-		return stream;
-	}
-
-	template<class T>
-	inline std::wistream& operator >> (std::wistream& stream, Quaternion<T>& quat)
-	{
-		if (stream.peek() == L'[')
-			stream.ignore(1);
-
-		stream >> quat[0];
-		if (stream.peek() == L',') stream.ignore(1);
-		stream >> quat[1];
-		if (stream.peek() == L',') stream.ignore(1);
-		stream >> quat[2];
-		if (stream.peek() == L',') stream.ignore(1);
-		stream >> quat[3];
-
-		if (stream.peek() == L']')
 			stream.ignore(1);
 
 		return stream;

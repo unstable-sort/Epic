@@ -98,7 +98,7 @@ namespace Epic::detail
 	template<class... Ts>
 	struct SpanElement 
 	{
-		using type = std::common_type_t<typename UnderlyingElement<std::decay_t<Ts>>::type...>;
+		using type = std::common_type_t<typename UnderlyingElement<std::remove_reference_t<std::remove_cv_t<Ts>>>::type...>;
 	};
 
 	// SpanElement_t
@@ -201,6 +201,18 @@ namespace Epic::detail
 		static Iterator Place(Iterator iterator, const Epic::detail::VectorSwizzler<U, N, Indices...>& item) noexcept
 		{
 			return Place(iterator, item.ToVector());
+		}
+
+		template<class Iterator, class U, size_t N>
+		static Iterator Place(Iterator iterator, U(&item)[N]) noexcept
+		{
+			for (size_t n = 0; n < N; ++n)
+			{
+				*iterator = static_cast<T>(item[n]);
+				iterator = std::next(iterator);
+			}
+
+			return iterator;
 		}
 
 		template<class Iterator, class U, size_t N>
