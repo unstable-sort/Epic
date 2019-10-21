@@ -163,6 +163,12 @@
     <ClInclude Include="src\Meta\Sequence.hpp" />
     <ClInclude Include="src\Meta\TypeTraits.hpp" />
     <ClInclude Include="src\Meta\Utility.hpp" />
+    <ClInclude Include="src\Utility\AutoList.hpp" />
+    <ClInclude Include="src\Utility\CHash.hpp" />
+    <ClInclude Include="src\Utility\Event.hpp" />
+    <ClInclude Include="src\Utility\EventDispatchers.hpp" />
+    <ClInclude Include="src\Utility\NullMutex.hpp" />
+    <ClInclude Include="src\Utility\Singleton.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,6 +10,12 @@
     <Filter Include="Meta">
       <UniqueIdentifier>{59e43d83-617b-46fb-b2da-305c7e394ba7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{1fc3e6bc-c74d-4bfa-ad98-5d81b2c016ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility\Event">
+      <UniqueIdentifier>{af57d8e7-4da6-46a8-98af-74d08ce77b03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Math\Vector.cpp">
@@ -115,6 +121,24 @@
     </ClInclude>
     <ClInclude Include="src\Math\detail\MetaHelpers.hpp">
       <Filter>Math\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility\CHash.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility\Singleton.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility\AutoList.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility\NullMutex.hpp">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility\Event.hpp">
+      <Filter>Utility\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utility\EventDispatchers.hpp">
+      <Filter>Utility\Event</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
