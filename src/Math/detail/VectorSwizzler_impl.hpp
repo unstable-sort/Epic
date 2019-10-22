@@ -37,8 +37,8 @@ public:
 
 private:
 	using TArray = VectorData<T, N>;
-	using IndexSeq = Meta::Sequence<size_t, Indices...>;
-	using VectorSeq = Meta::MakeSequence<size_t, Size>;
+	using IndexSeq = Meta::Sequence<Indices...>;
+	using VectorSeq = Meta::MakeSequence<Size>;
 	
 	static constexpr bool IsAssignableLValue = Meta::IsSequenceUnique_v<IndexSeq>;
 
@@ -65,7 +65,7 @@ public:
 	{
 		assert(IsAssignableLValue && "All swizzled indices must be unique to use this operation.");
 
-		Meta::ForEach2<IndexSeq, Meta::MakeSequence<size_t, sizeof...(Indices)>>
+		Meta::ForEach2<IndexSeq, Meta::MakeSequence<sizeof...(Indices)>>
 			::Call([&](size_t i, size_t j) { m_Values[i] = vec[j]; });
 
 		return *this;

@@ -20,11 +20,11 @@
 // Sequence<T>
 namespace Epic::Meta
 {
-	template<class T, T... Items>
-	using Sequence = std::integer_sequence<T, Items...>;
+	template<std::size_t... Items>
+	using Sequence = std::integer_sequence<std::size_t, Items...>;
 
-	template<class T, T N>
-	using MakeSequence = std::make_integer_sequence<T, N>;
+	template<std::size_t N>
+	using MakeSequence = std::make_integer_sequence<std::size_t, N>;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -35,8 +35,8 @@ namespace Epic::Meta
 	template<class Seq>
 	struct ForEach;
 
-	template<class T, T Item>
-	struct ForEach<Sequence<T, Item>>
+	template<std::size_t Item>
+	struct ForEach<Sequence<Item>>
 	{
 		template<class Function, class... Args>
 		static void Call(Function fn, Args&&... args)
@@ -45,13 +45,13 @@ namespace Epic::Meta
 		}
 	};
 
-	template<class T, T Item, T... Items>
-	struct ForEach<Sequence<T, Item, Items...>>
+	template<std::size_t Item, std::size_t... Items>
+	struct ForEach<Sequence<Item, Items...>>
 	{
 		template<class Function, class... Args>
 		static void Call(Function fn, Args&&... args)
 		{
-			using Next = ForEach<Sequence<T, Items...>>;
+			using Next = ForEach<Sequence<Items...>>;
 
 			fn(Item, std::forward<Args>(args)...);
 
@@ -59,10 +59,10 @@ namespace Epic::Meta
 		}
 	};
 
-	template<size_t N>
+	template<std::size_t N>
 	struct ForEachN
 	{
-		using Iter = ForEach<MakeSequence<size_t, N>>;
+		using Iter = ForEach<MakeSequence<N>>;
 
 		template<class Function, class... Args>
 		static void Call(Function fn, Args&&... args)
@@ -80,13 +80,13 @@ namespace Epic::Meta
 	template<class LeftSeq, class RightSeq>
 	struct ForEach2;
 
-	template<class T, T Left, T Right, T... LeftRest, T... RightRest>
-	struct ForEach2<Sequence<T, Left, LeftRest...>, Sequence<T, Right, RightRest...>>
+	template<std::size_t Left, std::size_t Right, std::size_t... LeftRest, std::size_t... RightRest>
+	struct ForEach2<Sequence<Left, LeftRest...>, Sequence<Right, RightRest...>>
 	{
 		template<class Function, class... Args>
 		static void Call(Function fn, Args&&... args)
 		{
-			using Next = ForEach2<Sequence<T, LeftRest...>, Sequence<T, RightRest...>>;
+			using Next = ForEach2<Sequence<LeftRest...>, Sequence<RightRest...>>;
 
 			fn(Left, Right, std::forward<Args>(args)...);
 
@@ -94,8 +94,8 @@ namespace Epic::Meta
 		}
 	};
 
-	template<class T, T Left, T Right>
-	struct ForEach2<Sequence<T, Left>, Sequence<T, Right>>
+	template<std::size_t Left, std::size_t Right>
+	struct ForEach2<Sequence<Left>, Sequence<Right>>
 	{
 		template<class Function, class... Args>
 		static void Call(Function fn, Args&&... args)
@@ -104,8 +104,8 @@ namespace Epic::Meta
 		}
 	};
 
-	template<class T, T... LeftRest>
-	struct ForEach2<Sequence<T, LeftRest...>, Sequence<T>>
+	template<std::size_t... LeftRest>
+	struct ForEach2<Sequence<LeftRest...>, Sequence<>>
 	{
 		template<class Function, class... Args>
 		static void Call(Function, Args&&...)
@@ -114,8 +114,8 @@ namespace Epic::Meta
 		}
 	};
 
-	template<class T, T... RightRest>
-	struct ForEach2<Sequence<T>, Sequence<T, RightRest...>>
+	template<std::size_t... RightRest>
+	struct ForEach2<Sequence<>, Sequence<RightRest...>>
 	{
 		template<class Function, class... Args>
 		static void Call(Function, Args&&...)
@@ -127,23 +127,23 @@ namespace Epic::Meta
 
 //////////////////////////////////////////////////////////////////////////////
 
-// SequenceContains - Determine whether Query is contained within a Sequence<T>
+// SequenceContains - Determine whether Query is contained within a Sequence
 namespace Epic::Meta
 {
-	template<class T, T Query, class Seq>
+	template<std::size_t Query, class Seq>
 	struct SequenceContains : std::false_type { };
 
-	template<class T, T Query, class Seq>
-	inline constexpr bool SequenceContains_v = SequenceContains<T, Query, Seq>::value;
+	template<std::size_t Query, class Seq>
+	inline constexpr bool SequenceContains_v = SequenceContains<Query, Seq>::value;
 
-	template<class T, T Query, T... Items>
-	struct SequenceContains<T, Query, Sequence<T, Items...>> 
+	template<std::size_t Query, std::size_t... Items>
+	struct SequenceContains<Query, Sequence<Items...>> 
 		: std::bool_constant<((Query == Items) || ...)> { };
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-// IsSequenceUnique - Determine whether every T within a Sequence<T> is unique
+// IsSequenceUnique - Determine whether every T within a Sequence is unique
 namespace Epic::Meta
 {
 	template<class Seq>
@@ -152,11 +152,11 @@ namespace Epic::Meta
 	template<class Seq>
 	inline constexpr bool IsSequenceUnique_v = IsSequenceUnique<Seq>::value;
 
-	template<class T, T Item>
-	struct IsSequenceUnique<Sequence<T, Item>> : std::true_type { };
+	template<std::size_t Item>
+	struct IsSequenceUnique<Sequence<Item>> : std::true_type { };
 
-	template<class T, T Item, T... Rest>
-	struct IsSequenceUnique<Sequence<T, Item, Rest...>>
-		: std::bool_constant<(!SequenceContains_v<T, Item, Sequence<T, Rest...>> && 
-							  IsSequenceUnique_v<Sequence<T, Rest...>>)> { };
+	template<std::size_t Item, std::size_t... Rest>
+	struct IsSequenceUnique<Sequence<Item, Rest...>>
+		: std::bool_constant<(!SequenceContains_v<Item, Sequence<Rest...>> && 
+							  IsSequenceUnique_v<Sequence<Rest...>>)> { };
 }
