@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include "../Meta/VariadicPlaceholder.hpp"
 #include "EventDispatchers.hpp"
 #include "CHash.hpp"
 
@@ -50,23 +51,13 @@ public:
 	template<class TInstance, class TClass>
 	void Connect(TInstance* pInstance, void (TClass::* pMember)(Args...), Epic::CHash handle = "") noexcept
 	{
-		const auto fn = [=](Args&&... args)
-		{
-			(pInstance->*pMember)(std::forward<Args>(args)...);
-		};
-
-		dispatcher_type::Bind(fn, handle, pInstance);
+		dispatcher_type::Bind(Epic::Meta::bind(pMember, pInstance), handle, pInstance);
 	}
 
 	template<class TInstance, class TClass>
 	void Connect(const TInstance* pInstance, void (TClass::* pMember)(Args...) const, Epic::CHash handle = "") noexcept
 	{
-		const auto fn = [=](Args&&... args)
-		{
-			(pInstance->*pMember)(std::forward<Args>(args)...);
-		};
-
-		dispatcher_type::Bind(fn, handle, pInstance);
+		dispatcher_type::Bind(Epic::Meta::bind(pMember, pInstance), handle, pInstance);
 	}
 
 	template<template<class...> class UDispatcher>

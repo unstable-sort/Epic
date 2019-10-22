@@ -163,6 +163,7 @@
     <ClInclude Include="src\Meta\Sequence.hpp" />
     <ClInclude Include="src\Meta\TypeTraits.hpp" />
     <ClInclude Include="src\Meta\Utility.hpp" />
+    <ClInclude Include="src\Meta\VariadicPlaceholder.hpp" />
     <ClInclude Include="src\Utility\AutoList.hpp" />
     <ClInclude Include="src\Utility\CHash.hpp" />
     <ClInclude Include="src\Utility\Event.hpp" />

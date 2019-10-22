@@ -140,5 +140,8 @@
     <ClInclude Include="src\Utility\EventDispatchers.hpp">
       <Filter>Utility\Event</Filter>
     </ClInclude>
+    <ClInclude Include="src\Meta\VariadicPlaceholder.hpp">
+      <Filter>Meta</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
